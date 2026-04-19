@@ -3,7 +3,7 @@ import requests
 import json
 
 # --- 1. НАСТРОЙКИ ---
-API_KEY = "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" 
+API_KEY = st.secrets["MY_API_KEY"]
 
 def get_ai_recommendation(item_type, genre, author, character, length, mood, extra):
     url = "https://openrouter.ai/api/v1/chat/completions"
