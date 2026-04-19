@@ -105,6 +105,10 @@ with st.container():
 
     st.write("") 
     if st.button("Сформировать рекомендации"):
+        st.write(f"Отладка: ключ начинается на {API_KEY[:10]}") 
+        
+        with st.spinner("Связь с ИИ..."):
+            res = get_ai_recommendation(f_type, f_genre, f_author, f_char, f_len, f_mood, f_extra)
         with st.spinner("Связь с ИИ..."):
             res = get_ai_recommendation(f_type, f_genre, f_author, f_char, f_len, f_mood, f_extra)
             st.divider()
