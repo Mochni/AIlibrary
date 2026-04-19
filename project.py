@@ -7,30 +7,28 @@ API_KEY = st.secrets["MY_API_KEY"]
 
 def get_ai_recommendation(item_type, genre, author, character, length, mood, extra):
     url = "https://openrouter.ai/api/v1/chat/completions"
-    headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",
+        "Content-Type": "application/json"
+    }
     
+    # Самые живучие модели на данный момент
     models_to_try = [
-        "openai/gpt-oss-120b:free",
-        "meta-llama/llama-3.2-3b-instruct:free",
+        "google/gemini-2.0-flash-lite-preview-02-05:free",
+        "deepseek/deepseek-chat:free",
+        "mistralai/mistral-7b-instruct:free",
         "openrouter/auto"
     ]
     
     system_instruction = (
         f"Ты — профессиональный консультант по {item_type}ам. "
-        "Твоя задача: подобрать произведения по заданным фильтрам. "
-        "Пиши ответ списком: Название, Автор, краткий сюжет. "
-        "Отвечай на русском языке."
+        "Подбери 3 конкретных произведения. Отвечай только на русском языке. "
+        "Формат: Название, Автор, краткое описание."
     )
 
-    # Собираем части запроса только если они заполнены
-    char_info = f"Персонаж или ключевая тема: {character}. " if character else ""
-    author_info = f"Автор: {author}. " if author else "Автор: любой. "
-    extra_info = f"Дополнительные пожелания: {extra}." if extra else ""
-
     user_query = (
-        f"Рекомендуй 3 {item_type}а. "
-        f"Жанр: {genre}. {char_info}{author_info}"
-        f"Объем: {length}, Настроение: {mood}. {extra_info}"
+        f"Найди 3 {item_type}а. Жанр: {genre}. Тема: {character}. "
+        f"Автор: {author}. Объем: {length}, Настроение: {mood}. Пожелание: {extra}"
     )
     
     for model_id in models_to_try:
@@ -39,17 +37,16 @@ def get_ai_recommendation(item_type, genre, author, character, length, mood, ext
             "messages": [
                 {"role": "system", "content": system_instruction},
                 {"role": "user", "content": user_query}
-            ],
-            "temperature": 0.7
+            ]
         }
         try:
-            response = requests.post(url, headers=headers, json=data)
+            response = requests.post(url, headers=headers, json=data, timeout=10)
             if response.status_code == 200:
                 return response.json()['choices'][0]['message']['content']
         except:
             continue
-    return "Ошибка: Модели перегружены. Попробуй еще раз."
-
+            
+    return "Все бесплатные сервера сейчас заняты. Подожди 10 секунд и нажми кнопку еще раз."
 # --- 2. ДИЗАЙН ---
 st.set_page_config(page_title="Book Advisor", layout="centered")
 
@@ -85,8 +82,16 @@ with st.container():
     with col1:
         f_type = st.radio("Материал", ["Книга", "Комикс"], horizontal=True)
         f_genre = st.selectbox("Жанр", [
-            "Супергероика", "Киберпанк", "Научная фантастика", "Темное фэнтези", 
-            "Нуар", "Психологический триллер", "Хоррор", "Мистика"
+            # Фантастика и будущее
+            "Киберпанк", "Научная фантастика", "Постапокалипсис", "Антиутопия", "Космоопера", 
+            # Фэнтези
+            "Темное фэнтези", "Героическое фэнтези", "Городское фэнтези", "Славянское фэнтези",
+            # Триллер и детектив
+            "Нуар", "Психологический триллер", "Классический детектив", "Боевик",
+            # Ужасы и мистика
+            "Хоррор", "Мистика", "Лавкрафтовские ужасы",
+            # Другое
+            "Магический реализм", "Исторический роман", "Сатира", "Биография", "Супергероика"
         ])
         f_author = st.text_input("Автор (необязательно)")
 
