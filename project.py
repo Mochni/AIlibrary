@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 import json
 
-
+# Получаем ключ из секретов
 API_KEY = st.secrets["MY_API_KEY"]
 
 def get_ai_recommendation(item_type, genre, author, character, length, mood, extra):
@@ -12,13 +12,12 @@ def get_ai_recommendation(item_type, genre, author, character, length, mood, ext
         "Content-Type": "application/json"
     }
     
-   
-   models_to_try = [
+    # Список моделей с правильными отступами
+    models_to_try = [
         "google/gemini-2.0-flash-lite-preview-02-05:free",
         "deepseek/deepseek-chat:free",
         "mistralai/mistral-7b-instruct:free",
         "openrouter/auto"
-    ]
     ]
     
     system_instruction = (
@@ -49,8 +48,10 @@ def get_ai_recommendation(item_type, genre, author, character, length, mood, ext
             
     return "Все бесплатные сервера сейчас заняты. Подожди 10 секунд и нажми кнопку еще раз."
 
+# Настройки страницы
 st.set_page_config(page_title="Book Advisor", layout="centered")
 
+# Стили
 st.markdown("""
     <style>
     .stApp { background-color: #1e1e1e; color: #d1d1d1; }
@@ -69,41 +70,33 @@ st.markdown("""
     .stButton>button:hover { background-color: #357abd; }
     .result-area {
         background-color: #252525; padding: 20px; border-radius: 8px;
-        border: 1px solid #333; margin-top: 20px;
+        border: 1px solid #333; margin-top: 20px; color: white;
     }
     </style>
     """, unsafe_allow_html=True)
 
 st.markdown("<div class='main-title'>Система подбора литературы</div>", unsafe_allow_html=True)
 
-
+# Интерфейс
 with st.container():
     col1, col2 = st.columns(2)
     
     with col1:
         f_type = st.radio("Материал", ["Книга", "Комикс"], horizontal=True)
         f_genre = st.selectbox("Жанр", [
-           
             "Киберпанк", "Научная фантастика", "Постапокалипсис", "Антиутопия", "Космоопера", 
-           
             "Темное фэнтези", "Героическое фэнтези", "Городское фэнтези", "Славянское фэнтези",
-            
             "Нуар", "Психологический триллер", "Классический детектив", "Боевик",
-           
             "Хоррор", "Мистика", "Лавкрафтовские ужасы",
-            
             "Магический реализм", "Исторический роман", "Сатира", "Биография", "Супергероика"
         ])
         f_author = st.text_input("Автор (необязательно)")
 
     with col2:
-       
         f_char = st.text_input("Персонаж / Тема (необязательно)")
         f_len = st.select_slider("Объем", options=["Короткий", "Средний", "Большой"])
         f_mood = st.select_slider("Настроение", options=["Мрачное", "Нейтральное", "Бодрое"])
-
     f_extra = st.text_area("Особые пожелания (необязательно)")
-
     st.write("") 
     if st.button("Сформировать рекомендации"):
         with st.spinner("Связь с ИИ..."):
