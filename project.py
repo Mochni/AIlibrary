@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 import json
 
-# --- 1. НАСТРОЙКИ ---
+
 API_KEY = st.secrets["MY_API_KEY"]
 
 def get_ai_recommendation(item_type, genre, author, character, length, mood, extra):
@@ -12,7 +12,7 @@ def get_ai_recommendation(item_type, genre, author, character, length, mood, ext
         "Content-Type": "application/json"
     }
     
-    # Самые живучие модели на данный момент
+   
     models_to_try = [
         "google/gemini-2.0-flash-lite-preview-02-05:free",
         "deepseek/deepseek-chat:free",
@@ -47,7 +47,7 @@ def get_ai_recommendation(item_type, genre, author, character, length, mood, ext
             continue
             
     return "Все бесплатные сервера сейчас заняты. Подожди 10 секунд и нажми кнопку еще раз."
-# --- 2. ДИЗАЙН ---
+
 st.set_page_config(page_title="Book Advisor", layout="centered")
 
 st.markdown("""
@@ -75,28 +75,28 @@ st.markdown("""
 
 st.markdown("<div class='main-title'>Система подбора литературы</div>", unsafe_allow_html=True)
 
-# --- 3. ИНТЕРФЕЙС ---
+
 with st.container():
     col1, col2 = st.columns(2)
     
     with col1:
         f_type = st.radio("Материал", ["Книга", "Комикс"], horizontal=True)
         f_genre = st.selectbox("Жанр", [
-            # Фантастика и будущее
+           
             "Киберпанк", "Научная фантастика", "Постапокалипсис", "Антиутопия", "Космоопера", 
-            # Фэнтези
+           
             "Темное фэнтези", "Героическое фэнтези", "Городское фэнтези", "Славянское фэнтези",
-            # Триллер и детектив
+            
             "Нуар", "Психологический триллер", "Классический детектив", "Боевик",
-            # Ужасы и мистика
+           
             "Хоррор", "Мистика", "Лавкрафтовские ужасы",
-            # Другое
+            
             "Магический реализм", "Исторический роман", "Сатира", "Биография", "Супергероика"
         ])
         f_author = st.text_input("Автор (необязательно)")
 
     with col2:
-        # ТЕПЕРЬ МОЖНО ОСТАВИТЬ ПУСТЫМ
+       
         f_char = st.text_input("Персонаж / Тема (необязательно)")
         f_len = st.select_slider("Объем", options=["Короткий", "Средний", "Большой"])
         f_mood = st.select_slider("Настроение", options=["Мрачное", "Нейтральное", "Бодрое"])
