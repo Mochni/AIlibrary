@@ -1,36 +1,24 @@
 import streamlit as st
 import requests
 import json
-
-# Получаем ключ из секретов
 API_KEY = st.secrets["MY_API_KEY"]
-
 def get_ai_recommendation(item_type, genre, author, character, length, mood, extra):
     url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {API_KEY}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://streamlit.io", # Важно для некоторых моделей
+        "X-Title": "Book Advisor"
     }
-    
-    # Список моделей с правильными отступами
     models_to_try = [
+        "openrouter/auto", 
         "google/gemini-2.0-flash-lite-preview-02-05:free",
         "deepseek/deepseek-chat:free",
-        "mistralai/mistral-7b-instruct:free",
-        "openrouter/auto"
+        "mistralai/mistral-7b-instruct:free"
     ]
     
-    system_instruction = (
-        f"Ты — профессиональный консультант по {item_type}ам. "
-        "Подбери 3 конкретных произведения. Отвечай только на русском языке. "
-        "Формат: Название, Автор, краткое описание."
-    )
-
-    user_query = (
-        f"Найди 3 {item_type}а. Жанр: {genre}. Тема: {character}. "
-        f"Автор: {author}. Объем: {length}, Настроение: {mood}. Пожелание: {extra}"
-    )
-    
+    system_instruction = f"Ты — крутой консультант по {item_type}ам. Посоветуй 3 годноты. Только на русском."
+    user_query = f"Жанр: {genre}. Тема: {character}. Автор: {author}. Настроение: {mood}. {extra}"
     for model_id in models_to_try:
         data = {
             "model": model_id, 
@@ -40,18 +28,15 @@ def get_ai_recommendation(item_type, genre, author, character, length, mood, ext
             ]
         }
         try:
-            response = requests.post(url, headers=headers, json=data, timeout=10)
+            response = requests.post(url, headers=headers, json=data, timeout=20)
             if response.status_code == 200:
                 return response.json()['choices'][0]['message']['content']
+            elif response.status_code == 429:
+                continue
         except:
             continue
-            
-    return "Все бесплатные сервера сейчас заняты. Подожди 10 секунд и нажми кнопку еще раз."
-
-# Настройки страницы
+    return "Слушай, сервера реально перегружены. Попробуй нажать кнопку еще раз через 15-20 секунд, какой-нибудь поток точно освободится."
 st.set_page_config(page_title="Book Advisor", layout="centered")
-
-# Стили
 st.markdown("""
     <style>
     .stApp { background-color: #1e1e1e; color: #d1d1d1; }
@@ -74,13 +59,9 @@ st.markdown("""
     }
     </style>
     """, unsafe_allow_html=True)
-
 st.markdown("<div class='main-title'>Система подбора литературы</div>", unsafe_allow_html=True)
-
-# Интерфейс
 with st.container():
     col1, col2 = st.columns(2)
-    
     with col1:
         f_type = st.radio("Материал", ["Книга", "Комикс"], horizontal=True)
         f_genre = st.selectbox("Жанр", [
@@ -91,7 +72,6 @@ with st.container():
             "Магический реализм", "Исторический роман", "Сатира", "Биография", "Супергероика"
         ])
         f_author = st.text_input("Автор (необязательно)")
-
     with col2:
         f_char = st.text_input("Персонаж / Тема (необязательно)")
         f_len = st.select_slider("Объем", options=["Короткий", "Средний", "Большой"])
