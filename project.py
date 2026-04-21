@@ -14,7 +14,7 @@ def get_ai_recommendation(item_type, genre, author, character, length, mood, ext
     }
     
     models_to_try = [
-        "google/gemini-2.0-flash-lite-preview-02-05:free",
+        "nvidia/nemotron-3-super-120b-a12b:free",
         "google/gemini-2.0-pro-exp-02-05:free",
         "mistralai/mistral-7b-instruct:free",
         "deepseek/deepseek-chat:free"
