@@ -14,7 +14,7 @@ def get_ai_recommendation(item_type, genre, author, character, length, mood, ext
     }
     
     models_to_try = [
-        "nousresearch/hermes-3-llama-3.1-405b:free",
+        "google/gemini-2.5-pro",
         "openai/gpt-oss-120b:free",
         "nvidia/nemotron-3-nano-30b-a3b:free",
         "deepseek/deepseek-chat:free"
