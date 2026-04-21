@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
-import json
+
+
 API_KEY = st.secrets["MY_API_KEY"]
 
 def get_ai_recommendation(item_type, genre, author, character, length, mood, extra):
@@ -11,6 +12,7 @@ def get_ai_recommendation(item_type, genre, author, character, length, mood, ext
         "HTTP-Referer": "https://streamlit.io",
         "X-Title": "Book Advisor"
     }
+    
     models_to_try = [
         "google/gemini-2.0-flash-lite-preview-02-05:free",
         "google/gemini-2.0-pro-exp-02-05:free",
@@ -36,7 +38,9 @@ def get_ai_recommendation(item_type, genre, author, character, length, mood, ext
         except:
             continue
     return "Слушай, сервера перегружены. Попробуй еще раз, или проверь MY_API_KEY в Secrets."
+
 st.set_page_config(page_title="Book Advisor", layout="centered")
+
 st.markdown("""
     <style>
     .stApp { background-color: #1e1e1e; color: #d1d1d1; }
@@ -86,4 +90,4 @@ with st.container():
         with st.spinner("Связь с ИИ..."):
             res = get_ai_recommendation(f_type, f_genre, f_author, f_char, f_len, f_mood, f_extra)
             st.divider()
-            st.markdown(f<div class='result-area'>{res}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='result-area'>{res}</div>", unsafe_allow_html=True)
