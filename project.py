@@ -83,9 +83,9 @@ with st.container():
         ])
         f_author = st.text_input("Автор (необязательно)")
         with col2:
-        f_char = st.text_input("Персонаж / Тема (необязательно)")
-        f_len = st.select_slider("Объем", options=["Короткий", "Средний", "Большой"])
-        f_mood = st.select_slider("Настроение", options=["Мрачное", "Нейтральное", "Бодрое"])
+            f_char = st.text_input("Персонаж / Тема (необязательно)")
+            f_len = st.select_slider("Объем", options=["Короткий", "Средний", "Большой"])
+            f_mood = st.select_slider("Настроение", options=["Мрачное", "Нейтральное", "Бодрое"])
     
     f_extra = st.text_area("Особые пожелания (необязательно)")
     
