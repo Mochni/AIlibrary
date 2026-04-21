@@ -2,23 +2,25 @@ import streamlit as st
 import requests
 import json
 API_KEY = st.secrets["MY_API_KEY"]
+
 def get_ai_recommendation(item_type, genre, author, character, length, mood, extra):
     url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://streamlit.io", # Важно для некоторых моделей
+        "HTTP-Referer": "https://streamlit.io",
         "X-Title": "Book Advisor"
     }
     models_to_try = [
-        "openrouter/auto", 
         "google/gemini-2.0-flash-lite-preview-02-05:free",
-        "deepseek/deepseek-chat:free",
-        "mistralai/mistral-7b-instruct:free"
+        "google/gemini-2.0-pro-exp-02-05:free",
+        "mistralai/mistral-7b-instruct:free",
+        "deepseek/deepseek-chat:free"
     ]
     
     system_instruction = f"Ты — крутой консультант по {item_type}ам. Посоветуй 3 годноты. Только на русском."
     user_query = f"Жанр: {genre}. Тема: {character}. Автор: {author}. Настроение: {mood}. {extra}"
+    
     for model_id in models_to_try:
         data = {
             "model": model_id, 
@@ -28,14 +30,12 @@ def get_ai_recommendation(item_type, genre, author, character, length, mood, ext
             ]
         }
         try:
-            response = requests.post(url, headers=headers, json=data, timeout=20)
+            response = requests.post(url, headers=headers, json=data, timeout=30)
             if response.status_code == 200:
                 return response.json()['choices'][0]['message']['content']
-            elif response.status_code == 429:
-                continue
         except:
             continue
-    return "Слушай, сервера реально перегружены. Попробуй нажать кнопку еще раз через 15-20 секунд, какой-нибудь поток точно освободится."
+    return "Слушай, сервера перегружены. Попробуй еще раз, или проверь MY_API_KEY в Secrets."
 st.set_page_config(page_title="Book Advisor", layout="centered")
 st.markdown("""
     <style>
@@ -59,7 +59,9 @@ st.markdown("""
     }
     </style>
     """, unsafe_allow_html=True)
+
 st.markdown("<div class='main-title'>Система подбора литературы</div>", unsafe_allow_html=True)
+
 with st.container():
     col1, col2 = st.columns(2)
     with col1:
@@ -76,10 +78,12 @@ with st.container():
         f_char = st.text_input("Персонаж / Тема (необязательно)")
         f_len = st.select_slider("Объем", options=["Короткий", "Средний", "Большой"])
         f_mood = st.select_slider("Настроение", options=["Мрачное", "Нейтральное", "Бодрое"])
+    
     f_extra = st.text_area("Особые пожелания (необязательно)")
+    
     st.write("") 
     if st.button("Сформировать рекомендации"):
         with st.spinner("Связь с ИИ..."):
             res = get_ai_recommendation(f_type, f_genre, f_author, f_char, f_len, f_mood, f_extra)
             st.divider()
-            st.markdown(f"<div class='result-area'>{res}</div>", unsafe_allow_html=True)
+            st.markdown(f<div class='result-area'>{res}</div>", unsafe_allow_html=True)
