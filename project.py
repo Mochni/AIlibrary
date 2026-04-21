@@ -1,7 +1,6 @@
 import streamlit as st
 import requests
 
-
 API_KEY = st.secrets["MY_API_KEY"]
 
 def get_ai_recommendation(item_type, genre, author, character, length, mood, extra):
@@ -34,7 +33,9 @@ def get_ai_recommendation(item_type, genre, author, character, length, mood, ext
         try:
             response = requests.post(url, headers=headers, json=data, timeout=30)
             if response.status_code == 200:
-                return response.json()['choices'][0]['message']['content']
+                # Добавил вывод ID модели перед текстом ответа
+                content = response.json()['choices'][0]['message']['content']
+                return f"[Использована модель: {model_id}]\n\n{content}"
         except:
             continue
     return "Слушай, сервера перегружены. Попробуй еще раз, или проверь MY_API_KEY в Secrets."
