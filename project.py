@@ -12,14 +12,13 @@ def get_ai_recommendation(item_type, genre, author, character, length, mood, ext
         "X-Title": "Book Advisor"
     }
     
+    # Оставил только одну модель
     models_to_try = [
-        "google/gemini-2.5-pro",
-        "openai/gpt-oss-120b:free",
-        "nvidia/nemotron-3-nano-30b-a3b:free",
-        "deepseek/deepseek-chat:free"
+        "openai/gpt-oss-120b:free"
     ]
     
-    system_instruction = f"Ты — крутой консультант по {item_type}ам. Посоветуй 3 годноты. Только на русском."
+    # Скорректировал инструкцию, чтобы меньше галлюцинировала
+    system_instruction = f"Ты — эксперт по {item_type}ам. Советуй только реально существующие произведения. Не выдумывай персонажей и сюжеты. Если не уверен — не пиши херни. Посоветуй 3 годноты на русском."
     user_query = f"Жанр: {genre}. Тема: {character}. Автор: {author}. Настроение: {mood}. {extra}"
     
     for model_id in models_to_try:
@@ -28,14 +27,13 @@ def get_ai_recommendation(item_type, genre, author, character, length, mood, ext
             "messages": [
                 {"role": "system", "content": system_instruction},
                 {"role": "user", "content": user_query}
-            ]
+            ],
+            "temperature": 0.3  # Снижаем креативность для точности
         }
         try:
             response = requests.post(url, headers=headers, json=data, timeout=30)
             if response.status_code == 200:
-                # Добавил вывод ID модели перед текстом ответа
-                content = response.json()['choices'][0]['message']['content']
-                return f"[Использована модель: {model_id}]\n\n{content}"
+                return response.json()['choices'][0]['message']['content']
         except:
             continue
     return "Слушай, сервера перегружены. Попробуй еще раз, или проверь MY_API_KEY в Secrets."
