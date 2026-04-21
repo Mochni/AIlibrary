@@ -11,13 +11,9 @@ def get_ai_recommendation(item_type, genre, author, character, length, mood, ext
         "HTTP-Referer": "https://streamlit.io",
         "X-Title": "Book Advisor"
     }
-    
-    # Оставил только одну модель
     models_to_try = [
         "openai/gpt-oss-120b:free"
     ]
-    
-    # Скорректировал инструкцию, чтобы меньше галлюцинировала
     system_instruction = f"Ты — эксперт по {item_type}ам. Советуй только реально существующие произведения. Не выдумывай персонажей и сюжеты. Если не уверен — не пиши херни. Посоветуй 3 годноты на русском."
     user_query = f"Жанр: {genre}. Тема: {character}. Автор: {author}. Настроение: {mood}. {extra}"
     
@@ -28,7 +24,7 @@ def get_ai_recommendation(item_type, genre, author, character, length, mood, ext
                 {"role": "system", "content": system_instruction},
                 {"role": "user", "content": user_query}
             ],
-            "temperature": 0.3  # Снижаем креативность для точности
+            "temperature": 0.3 
         }
         try:
             response = requests.post(url, headers=headers, json=data, timeout=30)
