@@ -14,7 +14,16 @@ def get_ai_recommendation(item_type, genre, author, character, length, mood, ext
     models_to_try = [
         "openai/gpt-oss-120b:free"
     ]
-    system_instruction = f"Ты — эксперт по {item_type}ам. Советуй только реально существующие произведения. Не выдумывай персонажей и сюжеты. Если не уверен — не пиши херни. Посоветуй 3 годноты на русском."
+    
+    system_instruction = (
+        f"Ты — опытный консультант по {item_type}ам. Твоя цель — посоветовать 3 РЕАЛЬНЫХ произведения. "
+        "Используй все свои знания, чтобы подобрать существующие книги или комиксы. "
+        "ВАЖНО: Если ты понимаешь, что по такому запросу ничего реально не существует и тебе "
+        "приходится выдумывать названия или персонажей — не делай этого. В этом КРАЙНЕМ случае напиши: "
+        "'К сожалению, по твоему специфическому запросу ничего не нашлось. Попробуй чуть изменить параметры.' "
+        "В остальных случаях — старайся подобрать максимально близкие по духу варианты. Только на русском."
+    )
+    
     user_query = f"Жанр: {genre}. Тема: {character}. Автор: {author}. Настроение: {mood}. {extra}"
     
     for model_id in models_to_try:
@@ -24,7 +33,7 @@ def get_ai_recommendation(item_type, genre, author, character, length, mood, ext
                 {"role": "system", "content": system_instruction},
                 {"role": "user", "content": user_query}
             ],
-            "temperature": 0.3 
+            "temperature": 0.4  
         }
         try:
             response = requests.post(url, headers=headers, json=data, timeout=30)
@@ -32,7 +41,7 @@ def get_ai_recommendation(item_type, genre, author, character, length, mood, ext
                 return response.json()['choices'][0]['message']['content']
         except:
             continue
-    return "Слушай, сервера перегружены. Попробуй еще раз, или проверь MY_API_KEY в Secrets."
+    return "Слушай, сервера перегружены. Попробуй еще раз чуть позже."
 
 st.set_page_config(page_title="Book Advisor", layout="centered")
 
@@ -73,7 +82,7 @@ with st.container():
             "Магический реализм", "Исторический роман", "Сатира", "Биография", "Супергероика", "Исторический детектив", "Любовный роман"
         ])
         f_author = st.text_input("Автор (необязательно)")
-    with col2:
+        with col2:
         f_char = st.text_input("Персонаж / Тема (необязательно)")
         f_len = st.select_slider("Объем", options=["Короткий", "Средний", "Большой"])
         f_mood = st.select_slider("Настроение", options=["Мрачное", "Нейтральное", "Бодрое"])
